@@ -1,0 +1,33 @@
+{
+  "name": "@hexlet/code",
+  "version": "0.0.1",
+  "description": "Hexlet frontend project lvl 2",
+  "bin": {
+    "gendiff": "bin/gendiff.js"
+  },
+  "engines": {
+    "node": ">=14"
+  },
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/f4hr/frontend-project-lvl2.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/f4hr/frontend-project-lvl2/issues"
+  },
+  "homepage": "https://github.com/f4hr/frontend-project-lvl2#readme",
+  "dependencies": {
+    "commander": "^7.1.0"
+  },
+  "devDependencies": {
+    "eslint": "^7.20.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-plugin-import": "^2.22.1"
+  }
+}
