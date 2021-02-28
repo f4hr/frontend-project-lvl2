@@ -16,7 +16,8 @@
   },
   "scripts": {
     "jest-watch": "npx -n '--experimental-vm-modules' jest --watch",
-    "test": "npx -n '--experimental-vm-modules' jest"
+    "test": "npx -n '--experimental-vm-modules' jest",
+    "coverage": "npx -n '--experimental-vm-modules' jest --coverage"
   },
   "repository": {
     "type": "git",
