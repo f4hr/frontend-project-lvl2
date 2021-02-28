@@ -17,7 +17,9 @@
   "scripts": {
     "jest-watch": "npx -n '--experimental-vm-modules' jest --watch",
     "test": "npx -n '--experimental-vm-modules' jest",
-    "coverage": "npx -n '--experimental-vm-modules' jest --coverage"
+    "coverage": "npx -n '--experimental-vm-modules' jest --coverage",
+    "json": "node bin/gendiff.js __fixtures__/json/empty.json __fixtures__/json/plain2.json",
+    "yaml": "node bin/gendiff.js __fixtures__/yaml/empty.yml __fixtures__/yaml/plain2.yml"
   },
   "repository": {
     "type": "git",
@@ -31,6 +33,7 @@
   "homepage": "https://github.com/f4hr/frontend-project-lvl2#readme",
   "dependencies": {
     "commander": "^7.1.0",
+    "js-yaml": "^4.0.0",
     "lodash": "^4.17.21"
   },
   "devDependencies": {

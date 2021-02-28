@@ -9,7 +9,7 @@
 
 ## Options and flat JSON example
 
-> \__fixtures__/plain1.json
+> \__fixtures__/json/flat1.json
 
 ```json
 {
@@ -20,7 +20,7 @@
 }
 ```
 
-> \__fixtures__/plain2.json
+> \__fixtures__/json/flat2.json
 
 ```json
 {
@@ -30,3 +30,23 @@
 }
 ```
 [![asciicast](https://asciinema.org/a/9pUWJtPxXaaNGnCmtECoDQuom.svg)](https://asciinema.org/a/9pUWJtPxXaaNGnCmtECoDQuom)
+
+## Flat YAML example
+
+> \__fixtures__/yaml/flat1.json
+
+```yaml
+host: hexlet.io
+timeout: 50
+proxy: 123.234.53.22
+follow: false
+```
+
+> \__fixtures__/yaml/flat2.json
+
+```yaml
+timeout: 20
+verbose: true
+host: hexlet.io
+```
+[![asciicast](https://asciinema.org/a/YuYSUpU8REhvkvSfWf4Ra0tzo.svg)](https://asciinema.org/a/YuYSUpU8REhvkvSfWf4Ra0tzo)
