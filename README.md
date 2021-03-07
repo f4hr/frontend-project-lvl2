@@ -33,7 +33,7 @@
 
 ## Flat YAML
 
-> \__fixtures__/yaml/flat1.json
+> \__fixtures__/yaml/flat1.yml
 
 ```yaml
 host: hexlet.io
@@ -42,7 +42,7 @@ proxy: 123.234.53.22
 follow: false
 ```
 
-> \__fixtures__/yaml/flat2.json
+> \__fixtures__/yaml/flat2.yml
 
 ```yaml
 timeout: 20
