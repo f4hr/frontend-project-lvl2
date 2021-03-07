@@ -9,6 +9,10 @@ trim_trailing_whitespace = true
 [Makefile]
 indent_style = tab
 
-[{*.json,*.yml,*.js}]
+[{*.json,*.yml,*.yaml,*.js}]
 indent_style = space
 indent_size = 2
+
+[__fixtures__/*.txt]
+insert_final_newline = false
+trim_trailing_whitespace = false

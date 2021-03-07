@@ -17,15 +17,13 @@
   "scripts": {
     "jest-watch": "npx -n '--experimental-vm-modules' jest --watch",
     "test": "npx -n '--experimental-vm-modules' jest",
-    "coverage": "npx -n '--experimental-vm-modules' jest --coverage",
-    "json": "node bin/gendiff.js __fixtures__/json/empty.json __fixtures__/json/plain2.json",
-    "yaml": "node bin/gendiff.js __fixtures__/yaml/empty.yml __fixtures__/yaml/plain2.yml"
+    "coverage": "npx -n '--experimental-vm-modules' jest --coverage"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/f4hr/frontend-project-lvl2.git"
   },
-  "author": "",
+  "author": "Ilya Fakhrutdinov",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/f4hr/frontend-project-lvl2/issues"
