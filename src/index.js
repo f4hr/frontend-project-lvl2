@@ -4,46 +4,53 @@ import _ from 'lodash';
 import parseData from './parsers.js';
 import formatDiff from './formatters.js';
 
-const defaultOptions = {
-  format: 'stylish',
-};
+const defaultOptions = { format: 'stylish' };
 
-const createDiff = (data1, data2) => {
-  const diff = data1.reduce((acc, { key: key1, value: val1 }) => {
-    const value = [val1];
-    let status = 'deleted';
+const createDiff = (obj1, obj2) => {
+  const iter = (data1, data2, acc) => {
+    const data1Keys = Object.keys(data1);
+    const data2Keys = Object.keys(data2);
+    let deleted = false;
 
-    data2.forEach(({ key: key2, value: val2 }) => {
-      if (key1 === key2 && val1 === val2) {
-        status = 'unchanged';
-      }
-      if (key1 === key2 && val1 !== val2) {
-        status = 'updated';
-        value.push(val2);
-      }
-    });
+    for (let i = 0; i < data1Keys.length; i += 1) {
+      const key = data1Keys[i];
+      const oldVal = data1[key];
 
-    acc.push({ key: key1, value, status });
+      if (data2Keys.includes(key)) {
+        const newVal = data2[key];
 
-    return acc;
-  }, []);
-
-  data2.forEach(({ key: key1, value: val2 }) => {
-    let exists = false;
-
-    for (let i = 0; i < diff.length; i += 1) {
-      const { key: key2 } = diff[i];
-
-      if (key1 === key2) {
-        exists = true;
-        break;
+        if (_.isObject(oldVal) && !_.isNull(oldVal) && _.isObject(newVal) && !_.isNull(newVal)) {
+          if (_.isEqual(oldVal, newVal)) {
+            acc.push({ status: 'unchanged', key, value: oldVal });
+          } else {
+            acc.push({ status: 'subobj', key, value: iter(oldVal, newVal, []) });
+          }
+        } else if (oldVal !== newVal) {
+          acc.push({ status: 'updated', key, value: [oldVal, newVal] });
+        } else {
+          acc.push({ status: 'unchanged', key, value: oldVal });
+        }
+      } else {
+        acc.push({ status: 'removed', key, value: oldVal });
+        deleted = true;
       }
     }
 
-    if (!exists) {
-      diff.push({ key: key1, value: [val2], status: 'added' });
+    if (!deleted && data2Keys.length === data1Keys.length) {
+      return acc;
     }
-  });
+
+    for (let k = 0; k < data2Keys.length; k += 1) {
+      const key = data2Keys[k];
+
+      if (!data1Keys.includes(key)) {
+        acc.push({ status: 'added', key, value: data2[key] });
+      }
+    }
+
+    return _.sortBy(acc, ({ key }) => key);
+  };
+  const diff = iter(obj1, obj2, []);
 
   return diff;
 };
@@ -64,9 +71,7 @@ const genDiff = (filepath1, filepath2, options = defaultOptions) => {
 
   const diff = createDiff(file1Parsed, file2Parsed);
 
-  const sorted = _.sortBy(diff, ({ key }) => key);
-
-  return formatDiff(sorted, format);
+  return formatDiff(diff, format);
 };
 
 export default genDiff;

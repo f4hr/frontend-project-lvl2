@@ -1,28 +1,59 @@
-const formatStylish = (entries) => {
-  const lines = [];
+const stylishDefaultOptions = {
+  replacer: ' ',
+  spacesCount: 4,
+};
 
-  lines.push('{');
-  entries.forEach(({ key, value, status }) => {
-    const tab = '  ';
+const stylishStatusValues = {
+  removed: '- ',
+  added: '+ ',
+  unchanged: '  ',
+  subobj: '  ',
+};
 
-    switch (status) {
-      case 'deleted':
-        lines.push(`${tab}- ${key}: ${value}`);
-        break;
-      case 'added':
-        lines.push(`${tab}+ ${key}: ${value}`);
-        break;
-      case 'updated':
-        lines.push(`${tab}- ${key}: ${value[0]}`);
-        lines.push(`${tab}+ ${key}: ${value[1]}`);
-        break;
-      default:
-        lines.push(`${tab}  ${key}: ${value}`);
+const formatStylish = (data, options = stylishDefaultOptions) => {
+  const currentOptions = { ...stylishDefaultOptions, ...options };
+  const { replacer, spacesCount } = currentOptions;
+  const indent = replacer.repeat(spacesCount);
+  const indentForValue = indent.substring(0, indent.length - 2);
+
+  const iter = (currentValue, status = 'unchanged', depth) => {
+    if (typeof currentValue !== 'object' || currentValue === null) {
+      return `${currentValue}`;
     }
-  });
-  lines.push('}');
 
-  return lines.join('\n');
+    let lines;
+
+    if (status === 'updated' || status === 'subobj') {
+      lines = currentValue.reduce((acc, { status: stat, key, value }) => {
+        if (stat === 'updated') {
+          const val1 = iter(value[0], 'unchanged', depth + 1);
+          const val2 = iter(value[1], 'unchanged', depth + 1);
+
+          acc.push(`${indentForValue}${stylishStatusValues.removed}${key}: ${val1}`);
+          acc.push(`${indentForValue}${stylishStatusValues.added}${key}: ${val2}`);
+
+          return acc;
+        }
+
+        const val = iter(value, stat, depth + 1);
+        acc.push(`${indentForValue}${stylishStatusValues[stat]}${key}: ${val}`);
+
+        return acc;
+      }, []);
+    } else {
+      const keys = Object.keys(currentValue);
+
+      lines = keys.map((key) => {
+        const value = iter(currentValue[key], 'unchanged', depth + 1);
+        return `${indentForValue}${stylishStatusValues.unchanged}${key}: ${value}`;
+      });
+    }
+    const delimiter = `\n${indent.repeat(depth)}`;
+
+    return ['{', ...lines, '}'].join(delimiter);
+  };
+
+  return iter(data, 'updated', 0);
 };
 
 const formatDiff = (entries, format) => {
