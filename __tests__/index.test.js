@@ -33,6 +33,8 @@ let flat2ToFlat1Diff;
 let emptyToFlat1Diff;
 let flat1ToEmptyDiff;
 let tree1ToTree2Diff;
+let plainFlat1ToFlat2Diff;
+let plainTree1ToTree2Diff;
 
 beforeAll(() => {
   // JSON
@@ -55,6 +57,8 @@ beforeAll(() => {
   emptyToFlat1Diff = readFileSync(`${__dirname}/../__fixtures__/empty-flat1.txt`, 'utf-8');
   flat1ToEmptyDiff = readFileSync(`${__dirname}/../__fixtures__/flat1-empty.txt`, 'utf-8');
   tree1ToTree2Diff = readFileSync(`${__dirname}/../__fixtures__/tree1-tree2.txt`, 'utf-8');
+  plainFlat1ToFlat2Diff = readFileSync(`${__dirname}/../__fixtures__/plain-flat1-flat2.txt`, 'utf-8');
+  plainTree1ToTree2Diff = readFileSync(`${__dirname}/../__fixtures__/plain-tree1-tree2.txt`, 'utf-8');
 });
 
 describe('JSON', () => {
@@ -82,5 +86,14 @@ describe('YAML', () => {
   });
   test('tree', () => {
     expect(genDiff(tree1Yaml, tree2Yaml)).toBe(tree1ToTree2Diff);
+  });
+});
+
+describe('Plain format', () => {
+  test('flat', () => {
+    expect(genDiff(flatJson1, flatYaml2, 'plain')).toBe(plainFlat1ToFlat2Diff);
+  });
+  test('tree', () => {
+    expect(genDiff(tree1Yaml, tree2Json, 'plain')).toBe(plainTree1ToTree2Diff);
   });
 });
