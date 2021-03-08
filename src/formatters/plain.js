@@ -2,56 +2,48 @@ const plainStatusValues = {
   pre: 'Property',
   removed: 'was removed',
   added: 'was added with value:',
-  unchanged: 'was not changed',
-  complex: '[complex value]',
   updated: 'was updated.',
+  complex: '[complex value]',
+};
+
+const buildLine = (value, path, status) => {
+  if (status === 'updated') {
+    const [val1, val2] = value;
+    return `${plainStatusValues.pre} '${path.join('.')}' ${plainStatusValues.updated} From ${val1} to ${val2}`;
+  }
+  if (status === 'added') {
+    return `${plainStatusValues.pre} '${path.join('.')}' ${plainStatusValues.added} ${value}`;
+  }
+  if (status === 'removed') {
+    return `${plainStatusValues.pre} '${path.join('.')}' ${plainStatusValues.removed}`;
+  }
+
+  return `${value}`;
 };
 
 export default (data) => {
-  const iter = (currentValue, status = 'unchanged', propPath = []) => {
+  const iter = (currentValue, propPath = [], status = 'unchanged') => {
     if (typeof currentValue !== 'object' || currentValue === null) {
       return (typeof currentValue === 'string') ? `'${currentValue}'` : `${currentValue}`;
     }
 
-    let lines;
-
-    if (status === 'updated' || status === 'complex') {
-      lines = currentValue.reduce((acc, { status: stat, key, value }) => {
-        const path = [...propPath];
-        path.push(key);
-        if (stat === 'updated') {
-          const val1 = iter(value[0], 'unchanged', propPath);
-          const val2 = iter(value[1], 'unchanged', propPath);
-
-          acc.push(`${plainStatusValues.pre} '${path.join('.')}' ${plainStatusValues.updated} From ${val1} to ${val2}`);
-
-          return acc;
-        }
-
-        const val = iter(value, stat, [...propPath, key]);
-        switch (stat) {
-          case 'added':
-            acc.push(`${plainStatusValues.pre} '${path.join('.')}' ${plainStatusValues.added} ${val}`);
-            break;
-          case 'removed':
-            acc.push(`${plainStatusValues.pre} '${path.join('.')}' ${plainStatusValues.removed}`);
-            break;
-          case 'complex':
-            acc.push(`${val}`);
-            break;
-          default:
-            break;
-        }
-
-        return acc;
-      }, []);
-    } else {
+    if (status !== 'updated' && status !== 'complex') {
       return `${plainStatusValues.complex}`;
     }
-    const delimiter = '\n';
+    const lines = currentValue.reduce((acc, { status: stat, key, value }) => {
+      if (stat === 'unchanged') {
+        return acc;
+      }
+      const path = [...propPath, key];
+      const val = (stat === 'updated') ? [iter(value[0], propPath), iter(value[1], propPath)] : iter(value, path, stat);
 
-    return lines.join(delimiter);
+      acc.push(buildLine(val, path, stat));
+
+      return acc;
+    }, []);
+
+    return lines.join('\n');
   };
 
-  return iter(data, 'updated');
+  return iter(data, [], 'updated');
 };
