@@ -114,3 +114,7 @@ group3:
 ## Recursive JSON and YAML (plain format)
 
 [![asciicast](https://asciinema.org/a/OfurL2BxTll9qOIBeaLphqhzh.svg)](https://asciinema.org/a/OfurL2BxTll9qOIBeaLphqhzh)
+
+## Recursive JSON and YAML (json format)
+
+[![asciicast](https://asciinema.org/a/ALacPTXGjdRgrVKRNipkwtOjH.svg)](https://asciinema.org/a/ALacPTXGjdRgrVKRNipkwtOjH)
