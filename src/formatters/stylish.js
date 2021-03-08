@@ -7,10 +7,10 @@ const stylishStatusValues = {
   removed: '- ',
   added: '+ ',
   unchanged: '  ',
-  subobj: '  ',
+  complex: '  ',
 };
 
-const formatStylish = (data, options = stylishDefaultOptions) => {
+export default (data, options = stylishDefaultOptions) => {
   const currentOptions = { ...stylishDefaultOptions, ...options };
   const { replacer, spacesCount } = currentOptions;
   const indent = replacer.repeat(spacesCount);
@@ -23,7 +23,7 @@ const formatStylish = (data, options = stylishDefaultOptions) => {
 
     let lines;
 
-    if (status === 'updated' || status === 'subobj') {
+    if (status === 'updated' || status === 'complex') {
       lines = currentValue.reduce((acc, { status: stat, key, value }) => {
         if (stat === 'updated') {
           const val1 = iter(value[0], 'unchanged', depth + 1);
@@ -55,12 +55,3 @@ const formatStylish = (data, options = stylishDefaultOptions) => {
 
   return iter(data, 'updated', 0);
 };
-
-const formatDiff = (entries, format) => {
-  switch (format) {
-    default:
-      return formatStylish(entries);
-  }
-};
-
-export default formatDiff;
