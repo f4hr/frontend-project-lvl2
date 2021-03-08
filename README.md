@@ -51,7 +51,7 @@ host: hexlet.io
 ```
 [![asciicast](https://asciinema.org/a/YuYSUpU8REhvkvSfWf4Ra0tzo.svg)](https://asciinema.org/a/YuYSUpU8REhvkvSfWf4Ra0tzo)
 
-## Recursive JSON and YAML
+## Recursive JSON and YAML (stylish format)
 
 > \__fixtures__/json/tree1.json
 
@@ -110,3 +110,7 @@ group3:
   fee: 100500
 ```
 [![asciicast](https://asciinema.org/a/s2mYpOKjrKrB4ZFAUBdG2FnrO.svg)](https://asciinema.org/a/s2mYpOKjrKrB4ZFAUBdG2FnrO)
+
+## Recursive JSON and YAML (plain format)
+
+[![asciicast](https://asciinema.org/a/OfurL2BxTll9qOIBeaLphqhzh.svg)](https://asciinema.org/a/OfurL2BxTll9qOIBeaLphqhzh)
