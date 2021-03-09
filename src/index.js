@@ -5,52 +5,42 @@ import parseData from './parsers.js';
 import formatDiff from './formatters/index.js';
 
 const createDiff = (obj1, obj2) => {
-  const iter = (data1, data2, acc) => {
+  const iter = (data1, data2) => {
     const data1Keys = Object.keys(data1);
     const data2Keys = Object.keys(data2);
-    let deleted = false;
 
-    for (let i = 0; i < data1Keys.length; i += 1) {
-      const key = data1Keys[i];
+    const acc1 = data1Keys.map((key) => {
       const oldVal = data1[key];
 
       if (data2Keys.includes(key)) {
         const newVal = data2[key];
 
         if (_.isObject(oldVal) && !_.isNull(oldVal) && _.isObject(newVal) && !_.isNull(newVal)) {
-          if (_.isEqual(oldVal, newVal)) {
-            acc.push({ status: 'unchanged', key, value: oldVal });
-          } else {
-            acc.push({ status: 'complex', key, value: iter(oldVal, newVal, []) });
-          }
-        } else if (oldVal !== newVal) {
-          acc.push({ status: 'updated', key, value: [oldVal, newVal] });
-        } else {
-          acc.push({ status: 'unchanged', key, value: oldVal });
+          return { status: 'complex', key, value: iter(oldVal, newVal) };
         }
-      } else {
-        acc.push({ status: 'removed', key, value: oldVal });
-        deleted = true;
+
+        if (oldVal !== newVal) {
+          return { status: 'updated', key, value: [oldVal, newVal] };
+        }
+
+        return { status: 'unchanged', key, value: oldVal };
       }
-    }
 
-    if (!deleted && data2Keys.length === data1Keys.length) {
-      return acc;
-    }
+      return { status: 'removed', key, value: oldVal };
+    });
 
-    for (let k = 0; k < data2Keys.length; k += 1) {
-      const key = data2Keys[k];
-
+    const acc2 = data2Keys.reduce((acc, key) => {
       if (!data1Keys.includes(key)) {
         acc.push({ status: 'added', key, value: data2[key] });
       }
-    }
 
-    return _.sortBy(acc, ({ key }) => key);
+      return acc;
+    }, []);
+
+    return _.sortBy([...acc1, ...acc2], ({ key }) => key);
   };
-  const diff = iter(obj1, obj2, []);
 
-  return diff;
+  return iter(obj1, obj2);
 };
 
 const genDiff = (filepath1, filepath2, formatName = 'stylish') => {

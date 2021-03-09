@@ -7,18 +7,16 @@ const plainStatusValues = {
 };
 
 const buildLine = (value, path, status) => {
-  if (status === 'updated') {
-    const [val1, val2] = value;
-    return `${plainStatusValues.pre} '${path.join('.')}' ${plainStatusValues.updated} From ${val1} to ${val2}`;
+  switch (status) {
+    case 'updated':
+      return `${plainStatusValues.pre} '${path.join('.')}' ${plainStatusValues.updated} From ${value[0]} to ${value[1]}`;
+    case 'added':
+      return `${plainStatusValues.pre} '${path.join('.')}' ${plainStatusValues.added} ${value}`;
+    case 'removed':
+      return `${plainStatusValues.pre} '${path.join('.')}' ${plainStatusValues.removed}`;
+    default:
+      return `${value}`;
   }
-  if (status === 'added') {
-    return `${plainStatusValues.pre} '${path.join('.')}' ${plainStatusValues.added} ${value}`;
-  }
-  if (status === 'removed') {
-    return `${plainStatusValues.pre} '${path.join('.')}' ${plainStatusValues.removed}`;
-  }
-
-  return `${value}`;
 };
 
 export default (data) => {
@@ -30,10 +28,12 @@ export default (data) => {
     if (status !== 'updated' && status !== 'complex') {
       return `${plainStatusValues.complex}`;
     }
+
     const lines = currentValue.reduce((acc, { status: stat, key, value }) => {
       if (stat === 'unchanged') {
         return acc;
       }
+
       const path = [...propPath, key];
       const val = (stat === 'updated') ? [iter(value[0], propPath), iter(value[1], propPath)] : iter(value, path, stat);
 

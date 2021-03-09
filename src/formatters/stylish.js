@@ -10,6 +10,8 @@ const stylishStatusValues = {
   complex: '  ',
 };
 
+const buildLine = (status, key, value, indent) => `${indent}${stylishStatusValues[status]}${key}: ${value}`;
+
 export default (data, options = stylishDefaultOptions) => {
   const currentOptions = { ...stylishDefaultOptions, ...options };
   const { replacer, spacesCount } = currentOptions;
@@ -21,34 +23,36 @@ export default (data, options = stylishDefaultOptions) => {
       return `${currentValue}`;
     }
 
-    let lines;
+    const delimiter = `\n${indent.repeat(depth)}`;
 
-    if (status === 'updated' || status === 'complex') {
-      lines = currentValue.reduce((acc, { status: stat, key, value }) => {
-        if (stat === 'updated') {
-          const val1 = iter(value[0], 'unchanged', depth + 1);
-          const val2 = iter(value[1], 'unchanged', depth + 1);
-
-          acc.push(`${indentForValue}${stylishStatusValues.removed}${key}: ${val1}`);
-          acc.push(`${indentForValue}${stylishStatusValues.added}${key}: ${val2}`);
-
-          return acc;
-        }
-
-        const val = iter(value, stat, depth + 1);
-        acc.push(`${indentForValue}${stylishStatusValues[stat]}${key}: ${val}`);
-
-        return acc;
-      }, []);
-    } else {
+    if (status !== 'updated' && status !== 'complex') {
       const keys = Object.keys(currentValue);
 
-      lines = keys.map((key) => {
+      const lines = keys.map((key) => {
         const value = iter(currentValue[key], 'unchanged', depth + 1);
-        return `${indentForValue}${stylishStatusValues.unchanged}${key}: ${value}`;
+
+        return buildLine('unchanged', key, value, indentForValue);
       });
+
+      return ['{', ...lines, '}'].join(delimiter);
     }
-    const delimiter = `\n${indent.repeat(depth)}`;
+
+    const lines = currentValue.reduce((acc, { status: stat, key, value }) => {
+      if (stat === 'updated') {
+        const val1 = iter(value[0], 'unchanged', depth + 1);
+        const val2 = iter(value[1], 'unchanged', depth + 1);
+
+        acc.push(buildLine('removed', key, val1, indentForValue));
+        acc.push(buildLine('added', key, val2, indentForValue));
+
+        return acc;
+      }
+
+      const val = iter(value, stat, depth + 1);
+      acc.push(buildLine(stat, key, val, indentForValue));
+
+      return acc;
+    }, []);
 
     return ['{', ...lines, '}'].join(delimiter);
   };
