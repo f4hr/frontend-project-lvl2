@@ -42,16 +42,16 @@ export default (data, options = stylishDefaultOptions) => {
         const val1 = iter(value[0], 'unchanged', depth + 1);
         const val2 = iter(value[1], 'unchanged', depth + 1);
 
-        acc.push(buildLine('removed', key, val1, indentForValue));
-        acc.push(buildLine('added', key, val2, indentForValue));
+        const line1 = buildLine('removed', key, val1, indentForValue);
+        const line2 = buildLine('added', key, val2, indentForValue);
 
-        return acc;
+        return [...acc, line1, line2];
       }
 
       const val = iter(value, stat, depth + 1);
-      acc.push(buildLine(stat, key, val, indentForValue));
+      const line = buildLine(stat, key, val, indentForValue);
 
-      return acc;
+      return [...acc, line];
     }, []);
 
     return ['{', ...lines, '}'].join(delimiter);

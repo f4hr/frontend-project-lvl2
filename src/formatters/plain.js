@@ -36,10 +36,9 @@ export default (data) => {
 
       const path = [...propPath, key];
       const val = (stat === 'updated') ? [iter(value[0], propPath), iter(value[1], propPath)] : iter(value, path, stat);
+      const line = buildLine(val, path, stat);
 
-      acc.push(buildLine(val, path, stat));
-
-      return acc;
+      return [...acc, line];
     }, []);
 
     return lines.join('\n');

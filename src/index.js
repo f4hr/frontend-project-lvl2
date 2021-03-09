@@ -31,7 +31,7 @@ const createDiff = (obj1, obj2) => {
 
     const acc2 = data2Keys.reduce((acc, key) => {
       if (!data1Keys.includes(key)) {
-        acc.push({ status: 'added', key, value: data2[key] });
+        return [...acc, { status: 'added', key, value: data2[key] }];
       }
 
       return acc;
