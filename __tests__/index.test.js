@@ -1,8 +1,7 @@
 import { readFileSync } from 'fs';
 import { fileURLToPath } from 'url';
-import { dirname } from 'path';
+import path from 'path';
 import {
-  beforeAll,
   test,
   expect,
 } from '@jest/globals';
@@ -10,38 +9,29 @@ import {
 import genDiff from '../src/index.js';
 
 const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+const __dirname = path.dirname(__filename);
 
-// JSON
-let tree1Json;
-let tree2Json;
-// YAML
-let tree2Yaml;
-let tree1Yaml;
-// Result
-let stylishtree1ToTree2Diff;
-let plainTree1ToTree2Diff;
-let jsonTree1ToTree2Diff;
-
-beforeAll(() => {
-  // JSON
-  tree1Json = `${__dirname}/../__fixtures__/json/tree1.json`;
-  tree2Json = `${__dirname}/../__fixtures__/json/tree2.json`;
-  // YAML
-  tree1Yaml = `${__dirname}/../__fixtures__/yaml/tree1.yml`;
-  tree2Yaml = `${__dirname}/../__fixtures__/yaml/tree2.yml`;
-  // Result
-  stylishtree1ToTree2Diff = readFileSync(`${__dirname}/../__fixtures__/stylish-tree1-tree2.txt`, 'utf-8');
-  plainTree1ToTree2Diff = readFileSync(`${__dirname}/../__fixtures__/plain-tree1-tree2.txt`, 'utf-8');
-  jsonTree1ToTree2Diff = readFileSync(`${__dirname}/../__fixtures__/json-tree1-tree2.txt`, 'utf-8');
-});
+const getFixturePath = (filename) => path.join(__dirname, '..', '__fixtures__', filename);
+const readFile = (filename) => readFileSync(getFixturePath(filename), 'utf-8', (err) => console.log(err));
 
 test('stylish format', () => {
-  expect(genDiff(tree1Json, tree2Yaml)).toBe(stylishtree1ToTree2Diff);
+  const file1 = getFixturePath('/json/tree1.json');
+  const file2 = getFixturePath('/yaml/tree2.yml');
+  const diff = genDiff(file1, file2);
+  const result = readFile('stylish-tree1-tree2.txt');
+  expect(diff).toBe(result);
 });
 test('plain format', () => {
-  expect(genDiff(tree1Yaml, tree2Json, 'plain')).toBe(plainTree1ToTree2Diff);
+  const file1 = getFixturePath('/yaml/tree1.yml');
+  const file2 = getFixturePath('/json/tree2.json');
+  const diff = genDiff(file1, file2, 'plain');
+  const result = readFile('plain-tree1-tree2.txt');
+  expect(diff).toBe(result);
 });
-test('json format', () => {
-  expect(genDiff(tree1Yaml, tree2Json, 'json')).toBe(jsonTree1ToTree2Diff);
+test('json format', async () => {
+  const file1 = getFixturePath('/yaml/tree1.yml');
+  const file2 = getFixturePath('/yaml/tree2.yml');
+  const diff = genDiff(file1, file2, 'json');
+  const result = readFile('json-tree1-tree2.txt');
+  expect(diff).toBe(result);
 });
