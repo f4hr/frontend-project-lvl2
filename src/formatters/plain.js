@@ -1,48 +1,33 @@
-const plainStatusValues = {
-  pre: 'Property',
-  removed: 'was removed',
-  added: 'was added with value:',
-  updated: 'was updated.',
-  complex: '[complex value]',
-};
+import _ from 'lodash';
 
-const buildLine = (value, path, status) => {
-  switch (status) {
-    case 'updated':
-      return `${plainStatusValues.pre} '${path.join('.')}' ${plainStatusValues.updated} From ${value[0]} to ${value[1]}`;
-    case 'added':
-      return `${plainStatusValues.pre} '${path.join('.')}' ${plainStatusValues.added} ${value}`;
-    case 'removed':
-      return `${plainStatusValues.pre} '${path.join('.')}' ${plainStatusValues.removed}`;
-    default:
-      return `${value}`;
-  }
+const formatValue = (val) => {
+  if (_.isPlainObject(val)) return '[complex value]';
+  return ((_.isString(val)) ? `'${val}'` : val);
 };
 
 export default (data) => {
-  const iter = (currentValue, propPath = [], status = 'unchanged') => {
-    if (typeof currentValue !== 'object' || currentValue === null) {
-      return (typeof currentValue === 'string') ? `'${currentValue}'` : `${currentValue}`;
-    }
+  const iter = (ast, path = []) => {
+    const diff = ast
+      .filter(({ status }) => status !== 'unchanged')
+      .map(({ key, status, value }) => {
+        switch (status) {
+          case 'updated': {
+            const [oldVal, newVal] = value;
+            return `Property '${[...path, key].join('.')}' was updated. From ${formatValue(oldVal)} to ${formatValue(newVal)}`;
+          }
+          case 'added':
+            return `Property '${[...path, key].join('.')}' was added with value: ${formatValue(value)}`;
+          case 'removed':
+            return `Property '${[...path, key].join('.')}' was removed`;
+          case 'nested':
+            return iter(value, [...path, key]);
+          default:
+            throw new Error(`Unknown status "${status}"`);
+        }
+      });
 
-    if (status !== 'updated' && status !== 'complex') {
-      return `${plainStatusValues.complex}`;
-    }
-
-    const lines = currentValue.reduce((acc, { status: stat, key, value }) => {
-      if (stat === 'unchanged') {
-        return acc;
-      }
-
-      const path = [...propPath, key];
-      const val = (stat === 'updated') ? [iter(value[0], propPath), iter(value[1], propPath)] : iter(value, path, stat);
-      const line = buildLine(val, path, stat);
-
-      return [...acc, line];
-    }, []);
-
-    return lines.join('\n');
+    return diff.join('\n');
   };
 
-  return iter(data, [], 'updated');
+  return iter(data);
 };
