@@ -1,59 +1,22 @@
 import path from 'path';
 import { readFileSync } from 'fs';
-import _ from 'lodash';
-import parseData from './parsers.js';
+import parse from './parsers.js';
+import getAst from './ast.js';
 import formatDiff from './formatters/index.js';
 
-const createDiff = (obj1, obj2) => {
-  const obj1Keys = Object.keys(obj1);
-  const obj2Keys = Object.keys(obj2);
-
-  const acc1 = obj1Keys.map((key) => {
-    const oldVal = obj1[key];
-
-    if (obj2Keys.includes(key)) {
-      const newVal = obj2[key];
-
-      if (_.isObject(oldVal) && !_.isNull(oldVal) && _.isObject(newVal) && !_.isNull(newVal)) {
-        return { status: 'complex', key, value: createDiff(oldVal, newVal) };
-      }
-
-      if (oldVal !== newVal) {
-        return { status: 'updated', key, value: [oldVal, newVal] };
-      }
-
-      return { status: 'unchanged', key, value: oldVal };
-    }
-
-    return { status: 'removed', key, value: oldVal };
-  });
-
-  const acc2 = obj2Keys.reduce((acc, key) => {
-    if (!obj1Keys.includes(key)) {
-      return [...acc, { status: 'added', key, value: obj2[key] }];
-    }
-
-    return acc;
-  }, []);
-
-  return _.sortBy([...acc1, ...acc2], ({ key }) => key);
-};
-
-const genDiff = (filepath1, filepath2, formatName = 'stylish') => {
+export default (filepath1, filepath2, formatName = 'stylish') => {
   const path1 = path.resolve(filepath1);
   const path2 = path.resolve(filepath2);
-  const ext1 = path.extname(path1);
-  const ext2 = path.extname(path2);
+  const ext1 = path.extname(path1).substring(1);
+  const ext2 = path.extname(path2).substring(1);
 
-  const file1Content = readFileSync(path1);
-  const file2Content = readFileSync(path2);
+  const file1 = readFileSync(path1);
+  const file2 = readFileSync(path2);
 
-  const file1Parsed = parseData(file1Content, ext1);
-  const file2Parsed = parseData(file2Content, ext2);
+  const file1Content = parse(file1, ext1);
+  const file2Content = parse(file2, ext2);
 
-  const diff = createDiff(file1Parsed, file2Parsed);
+  const diff = getAst(file1Content, file2Content);
 
   return formatDiff(diff, formatName);
 };
-
-export default genDiff;
