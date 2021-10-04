@@ -1,14 +1,15 @@
+import formatJson from './json.js';
 import formatStylish from './stylish.js';
 import formatPlain from './plain.js';
 
-const formatDiff = (entries, formatName) => {
-  switch (formatName) {
+const formatDiff = (data, format) => {
+  switch (format) {
     case 'json':
-      return JSON.stringify(entries);
+      return formatJson(data);
     case 'plain':
-      return formatPlain(entries);
+      return formatPlain(data);
     default:
-      return formatStylish(entries);
+      return formatStylish(data);
   }
 };
 
