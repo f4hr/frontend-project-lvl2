@@ -8,22 +8,27 @@ const getAst = (obj1, obj2) => {
     const newVal = obj2[key];
 
     if (!_.has(obj1, key)) {
-      return { key, status: 'added', value: newVal };
+      return { key, type: 'added', newValue: newVal };
     }
 
     if (!_.has(obj2, key)) {
-      return { key, status: 'removed', value: oldVal };
+      return { key, type: 'removed', oldValue: oldVal };
     }
 
     if (_.isPlainObject(oldVal) && _.isPlainObject(newVal)) {
-      return { key, status: 'nested', value: getAst(oldVal, newVal) };
+      return { key, type: 'nested', children: getAst(oldVal, newVal) };
     }
 
     if (oldVal !== newVal) {
-      return { key, status: 'updated', value: [oldVal, newVal] };
+      return {
+        key,
+        type: 'updated',
+        oldValue: oldVal,
+        newValue: newVal,
+      };
     }
 
-    return { key, status: 'unchanged', value: oldVal };
+    return { key, type: 'unchanged', oldValue: oldVal };
   });
 };
 

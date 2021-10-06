@@ -8,21 +8,19 @@ const formatValue = (val) => {
 export default (data) => {
   const iter = (ast, path = []) => {
     const diff = ast
-      .filter(({ status }) => status !== 'unchanged')
-      .map(({ key, status, value }) => {
-        switch (status) {
-          case 'updated': {
-            const [oldVal, newVal] = value;
-            return `Property '${[...path, key].join('.')}' was updated. From ${formatValue(oldVal)} to ${formatValue(newVal)}`;
-          }
+      .filter(({ type }) => type !== 'unchanged')
+      .map((node) => {
+        switch (node.type) {
+          case 'updated':
+            return `Property '${[...path, node.key].join('.')}' was updated. From ${formatValue(node.oldValue)} to ${formatValue(node.newValue)}`;
           case 'added':
-            return `Property '${[...path, key].join('.')}' was added with value: ${formatValue(value)}`;
+            return `Property '${[...path, node.key].join('.')}' was added with value: ${formatValue(node.newValue)}`;
           case 'removed':
-            return `Property '${[...path, key].join('.')}' was removed`;
+            return `Property '${[...path, node.key].join('.')}' was removed`;
           case 'nested':
-            return iter(value, [...path, key]);
+            return iter(node.children, [...path, node.key]);
           default:
-            throw new Error(`Unknown status "${status}"`);
+            throw new Error(`Unknown type "${node.type}"`);
         }
       });
 

@@ -22,25 +22,24 @@ export default (data, options = defaultOptions) => {
       return ['{', ...lines, '}'].join(delimiter);
     }
 
-    const lines = tree.map(({ status, key, value }) => {
-      switch (status) {
+    const lines = tree.map((node) => {
+      switch (node.type) {
         case 'updated': {
-          const [oldVal, newVal] = value;
-
-          const line1 = `${valIndent}- ${key}: ${iter(oldVal, depth + 1)}`;
-          const line2 = `${valIndent}+ ${key}: ${iter(newVal, depth + 1)}`;
+          const line1 = `${valIndent}- ${node.key}: ${iter(node.oldValue, depth + 1)}`;
+          const line2 = `${valIndent}+ ${node.key}: ${iter(node.newValue, depth + 1)}`;
 
           return [line1, line2].join(delimiter);
         }
         case 'added':
-          return `${valIndent}+ ${key}: ${iter(value, depth + 1)}`;
+          return `${valIndent}+ ${node.key}: ${iter(node.newValue, depth + 1)}`;
         case 'removed':
-          return `${valIndent}- ${key}: ${iter(value, depth + 1)}`;
+          return `${valIndent}- ${node.key}: ${iter(node.oldValue, depth + 1)}`;
         case 'unchanged':
+          return `${valIndent}  ${node.key}: ${iter(node.oldValue, depth + 1)}`;
         case 'nested':
-          return `${valIndent}  ${key}: ${iter(value, depth + 1)}`;
+          return `${valIndent}  ${node.key}: ${iter(node.children, depth + 1)}`;
         default:
-          throw new Error(`Unknown status "${status}"`);
+          throw new Error(`Unknown type "${node.type}"`);
       }
     });
 
