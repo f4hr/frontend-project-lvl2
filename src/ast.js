@@ -1,34 +1,34 @@
 import _ from 'lodash';
 
 const getAst = (obj1, obj2) => {
-  const combinedKeys = _.sortBy(_.union(_.keys(obj1), _.keys(obj2)), (obj) => obj);
+  const combinedKeys = _.sortBy(_.union(_.keys(obj1), _.keys(obj2)));
 
   return combinedKeys.map((key) => {
-    const oldVal = obj1[key];
-    const newVal = obj2[key];
+    const value1 = obj1[key];
+    const value2 = obj2[key];
 
     if (!_.has(obj1, key)) {
-      return { key, type: 'added', newValue: newVal };
+      return { key, type: 'added', value2 };
     }
 
     if (!_.has(obj2, key)) {
-      return { key, type: 'removed', oldValue: oldVal };
+      return { key, type: 'removed', value1 };
     }
 
-    if (_.isPlainObject(oldVal) && _.isPlainObject(newVal)) {
-      return { key, type: 'nested', children: getAst(oldVal, newVal) };
+    if (_.isPlainObject(value1) && _.isPlainObject(value2)) {
+      return { key, type: 'nested', children: getAst(value1, value2) };
     }
 
-    if (oldVal !== newVal) {
+    if (!_.isEqual(value1, value2)) {
       return {
         key,
         type: 'updated',
-        oldValue: oldVal,
-        newValue: newVal,
+        value1,
+        value2,
       };
     }
 
-    return { key, type: 'unchanged', oldValue: oldVal };
+    return { key, type: 'unchanged', value1 };
   });
 };
 
