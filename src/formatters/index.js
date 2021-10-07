@@ -8,8 +8,10 @@ const formatDiff = (data, format) => {
       return formatJson(data);
     case 'plain':
       return formatPlain(data);
-    default:
+    case 'stylish':
       return formatStylish(data);
+    default:
+      throw new Error(`Unknown format "${format}"`);
   }
 };
 
