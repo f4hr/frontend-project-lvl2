@@ -4,14 +4,19 @@ import parse from './parsers.js';
 import getAst from './ast.js';
 import formatDiff from './formatters/index.js';
 
-export default (filepath1, filepath2, formatName = 'stylish') => {
-  const path1 = path.resolve(filepath1);
-  const path2 = path.resolve(filepath2);
-  const ext1 = path.extname(path1).substring(1);
-  const ext2 = path.extname(path2).substring(1);
+const getPath = (filePath) => path.resolve(filePath);
+const getExtension = (filePath) => path.extname(filePath).substring(1);
+const getContent = (filePath) => readFileSync(filePath);
 
-  const file1 = readFileSync(path1);
-  const file2 = readFileSync(path2);
+export default (filepath1, filepath2, formatName = 'stylish') => {
+  const path1 = getPath(filepath1);
+  const path2 = getPath(filepath2);
+
+  const ext1 = getExtension(path1);
+  const ext2 = getExtension(path2);
+
+  const file1 = getContent(path1);
+  const file2 = getContent(path2);
 
   const file1Content = parse(file1, ext1);
   const file2Content = parse(file2, ext2);
